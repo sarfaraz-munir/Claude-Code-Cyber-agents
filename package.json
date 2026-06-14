@@ -1,0 +1,48 @@
+{
+  "name": "ciso-agents",
+  "version": "1.0.0",
+  "description": "CISO-grade cybersecurity swarm: hierarchical orchestrator with 9 specialist AI agents covering risk, compliance, threat intelligence, architecture, IR, vuln-mgmt, DevSecOps, awareness, and AI security",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run --no-coverage",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "vitest": "^3.2.6"
+  },
+  "keywords": [
+    "ciso",
+    "cybersecurity",
+    "risk-management",
+    "compliance",
+    "threat-intelligence",
+    "incident-response",
+    "vulnerability-management",
+    "devsecops",
+    "swarm",
+    "multi-agent",
+    "owasp",
+    "mitre-attack",
+    "ai-security",
+    "nist",
+    "gdpr",
+    "soc2"
+  ],
+  "author": "Sarfaraz Munir",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smuneer/CISO-agents"
+  }
+}

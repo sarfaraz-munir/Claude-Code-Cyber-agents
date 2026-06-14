@@ -1,0 +1,13 @@
+export { CISOSwarmPlugin } from './plugin.js';
+export { CISOOrchestrator } from './ciso-orchestrator.js';
+export { RiskGovernanceAgent }          from './agents/risk-governance.js';
+export { ComplianceAuditAgent }         from './agents/compliance-audit.js';
+export { ThreatIntelligenceAgent }      from './agents/threat-intelligence.js';
+export { SecurityArchitectureAgent }    from './agents/security-architecture.js';
+export { IncidentResponseAgent }        from './agents/incident-response.js';
+export { VulnerabilityManagementAgent } from './agents/vulnerability-management.js';
+export { DevSecOpsAgent }               from './agents/devsecops.js';
+export { SecurityAwarenessAgent }       from './agents/security-awareness.js';
+export { AISecurityAgent }             from './agents/ai-security.js';
+export type { AISystemProfile, AISecurityFinding, AIRedTeamPlan, AIShadowInventory } from './agents/ai-security.js';
+export * from './types.js';
