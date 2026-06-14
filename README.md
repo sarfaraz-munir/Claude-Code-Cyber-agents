@@ -2,7 +2,6 @@
 
 A production-ready hierarchical swarm of 10 AI agents (1 CISO queen orchestrator + 9 specialist workers) built for Claude Code. Covers the full enterprise CISO skill set: risk governance, compliance audit, threat intelligence, security architecture, incident response, vulnerability management, DevSecOps, security awareness, and AI security.
 
-![Alt Text] (images/CISO%20Agents%20Architecture%20.png)
 
 ## Key Features
 
