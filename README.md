@@ -4,7 +4,7 @@ A production-ready hierarchical swarm of 10 AI agents (1 CISO queen orchestrator
 
 ## Key Features
 
-The swarm provides structured agent files, skill files, a slash command, and 20 MCP tools that activate contextually based on security domain. Each agent contains domain expertise, methodology, frameworks, and output templates for consistent, professional-grade security deliverables.
+This repo provides structured agent files, skill files, a slash command, and 20 MCP tools that activate contextually based on security domain. Each agent contains domain expertise, methodology, frameworks, and output templates for consistent, professional-grade security deliverables.
 
 - **Hierarchical orchestration** — CISO queen spawns all 9 specialists in parallel and synthesises a unified `SecurityPostureReport`
 - **Full CISO skill set** — risk, compliance, threat intelligence, architecture, IR, vuln-mgmt, DevSecOps, awareness, and AI/LLM security
@@ -14,7 +14,7 @@ The swarm provides structured agent files, skill files, a slash command, and 20 
 - **TypeScript API** — `CISOOrchestrator` class usable standalone with zero external dependencies
 - **21 tests passing** — full unit test coverage, standalone (no monorepo required)
 
-## Swarm Architecture
+## CISO Cyber Agents Architecture
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -142,7 +142,7 @@ We have a customer-facing LLM chatbot integrated with GPT-4 via API.
 ### Slash command
 
 ```
-/ciso-posture-review Ruflo v3 platform
+/ciso-posture-review 
 ```
 
 ### TypeScript API
@@ -198,4 +198,4 @@ See [SECURITY.md](SECURITY.md) for the full responsible use policy.
 
 ## License
 
-[MIT](LICENSE) © 2025 Sarfaraz Munir
+[MIT](LICENSE) © 2026 Sarfaraz Muneer
