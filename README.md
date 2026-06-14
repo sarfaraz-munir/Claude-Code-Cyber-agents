@@ -2,6 +2,8 @@
 
 A production-ready hierarchical swarm of 10 AI agents (1 CISO queen orchestrator + 9 specialist workers) built for Claude Code. Covers the full enterprise CISO skill set: risk governance, compliance audit, threat intelligence, security architecture, incident response, vulnerability management, DevSecOps, security awareness, and AI security.
 
+https://github.com/sarfaraz-munir/Claude-Code-Cyber-agents/blob/main/CISO%20Agents%20Architecture%20.png?raw=true
+
 ## Key Features
 
 This repo provides structured agent files, skill files, a slash command, and 20 MCP tools that activate contextually based on security domain. Each agent contains domain expertise, methodology, frameworks, and output templates for consistent, professional-grade security deliverables.
