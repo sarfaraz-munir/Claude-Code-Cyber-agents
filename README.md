@@ -17,6 +17,10 @@ This repo provides structured agent files, skill files, a slash command, and 20 
 
 ## CISO Cyber Agents Architecture
 
+<div align="center">
+    <img src="assets/agentarchitecture%20.png" alt="CISO Agents Architecture" width="900">
+  </div>
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │                   CISO Queen                        │
