@@ -195,6 +195,67 @@ CISO-agents/
 └── examples/                     # Usage examples
 ```
 
+## Test Prompts
+
+Ready-to-use prompts for testing the agent in Claude Code, ChatGPT Custom GPT, or Microsoft Copilot Studio:
+
+**Full Posture Review**
+```
+Run a full security posture review for a 300-person fintech company on AWS. We have MFA, a SIEM, and EDR deployed. We process payments and are subject to PCI-DSS and SOC2-TypeII. We recently deployed an internal GPT-4 chatbot with access to customer transaction data.
+```
+
+**Risk Assessment**
+```
+Build a risk register for a healthcare SaaS company that stores PHI, uses third-party ML models for diagnostics, and has no PAM solution in place. Score and prioritise the top 10 risks.
+```
+
+**Compliance Gap Analysis**
+```
+Assess our compliance posture against GDPR, ISO-27001, and NIST-CSF. We have encryption in transit but not at rest, no formal data retention policy, and we share customer data with two EU-based subprocessors.
+```
+
+**Threat Intelligence**
+```
+Who are the most likely threat actors targeting a UK-based law firm handling M&A deal data? Map the top 5 threats to MITRE ATT&CK techniques and recommend detection controls.
+```
+
+**Vulnerability Triage**
+```
+Triage these CVEs and give me a patch plan: CVE-2024-3400 (CVSS 10.0), CVE-2023-44487 (CVSS 7.5), CVE-2024-21762 (CVSS 9.6, in CISA KEV), CVE-2023-20198 (CVSS 10.0). Which must be patched this week?
+```
+
+**Incident Response**
+```
+Build a ransomware incident response playbook for a hospital with 5,000 endpoints. Include containment steps, backup validation, communication plan, and regulatory notification requirements under HIPAA.
+```
+
+**Zero Trust & Architecture**
+```
+Assess our zero trust posture. We use Azure AD with MFA, have no microsegmentation, all staff are on VPN, service accounts have standing admin access, and we have no UEBA. Where are the biggest gaps?
+```
+
+**DevSecOps Pipeline Audit**
+```
+Audit our CI/CD security. We use GitHub Actions with branch protection and PR reviews. We run SAST via CodeQL but have no secrets scanning, no SBOM generation, no container scanning, and no dependency review. Give us a findings table and a remediation pipeline template.
+```
+
+**AI / LLM Security**
+```
+Assess the security of our internal RAG-based LLM assistant. It uses the Anthropic API, has tool-use enabled (can query our CRM and send emails), processes employee PII, and is internet-facing. Map risks to OWASP LLM Top 10 and tell us if we fall under the EU AI Act high-risk category.
+```
+
+**Security Awareness**
+```
+Design a 12-month security awareness programme for a 1,000-person retail company with high staff turnover. Include phishing simulation schedule, role-based training modules, and a KPI dashboard to present to the board.
+```
+
+**Board Reporting**
+```
+Summarise our security posture for a board presentation. Overall risk score is 42/100, we have 3 critical open risks, SOC2 compliance at 67%, and a ransomware incident last quarter. What are the top 5 points the board needs to act on?
+```
+
+---
+
 ## Legal Notice
 
 This swarm is intended for **authorized security testing, research, and educational purposes only**. Before using any capability against systems you do not own, you must obtain written authorization from the system owner.
