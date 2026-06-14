@@ -195,6 +195,18 @@ CISO-agents/
 └── examples/                     # Usage examples
 ```
 
+## Deploy as a Custom AI Agent
+
+To use the CISO orchestrator in ChatGPT Custom GPT, Microsoft Copilot Studio, or Claude Projects, copy the pre-built system prompt from [AGENT_INSTRUCTIONS.md](AGENT_INSTRUCTIONS.md) and paste it into your agent builder's instructions field.
+
+| Platform | Where to paste |
+|----------|---------------|
+| ChatGPT Custom GPT | Explore GPTs → Create → Configure → Instructions |
+| Microsoft Copilot Studio | Create Agent → Instructions tab |
+| Claude Projects | Project → Project Instructions |
+
+---
+
 ## Test Prompts
 
 Ready-to-use prompts for testing the agent in Claude Code, ChatGPT Custom GPT, or Microsoft Copilot Studio:
