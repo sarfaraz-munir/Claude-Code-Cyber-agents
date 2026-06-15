@@ -10,4 +10,5 @@ export { DevSecOpsAgent }               from './agents/devsecops.js';
 export { SecurityAwarenessAgent }       from './agents/security-awareness.js';
 export { AISecurityAgent }             from './agents/ai-security.js';
 export type { AISystemProfile, AISecurityFinding, AIRedTeamPlan, AIShadowInventory } from './agents/ai-security.js';
+export { RedTeamAgent }                from './agents/red-team.js';
 export * from './types.js';

@@ -18,7 +18,8 @@ export type CISOAgentRole =
   | 'vulnerability-management'// CVE scanning, EPSS scoring, patch prioritisation
   | 'devsecops'               // SAST/DAST, SBOM, pipeline hardening, secrets scanning
   | 'security-awareness'      // Training programmes, phishing simulation, KPIs
-  | 'ai-security';            // LLM/ML threat modeling, OWASP LLM Top 10, MITRE ATLAS, AI governance
+  | 'ai-security'             // LLM/ML threat modeling, OWASP LLM Top 10, MITRE ATLAS, AI governance
+  | 'red-team';               // Offensive security: recon, exploitation simulation, lateral movement
 
 // ───────── Severity / priority ───────────────────────────────────────────────
 
@@ -216,7 +217,8 @@ export type CISOTaskType =
   | 'architecture-review'
   | 'devsecops-audit'
   | 'awareness-program'
-  | 'executive-briefing';
+  | 'executive-briefing'
+  | 'red-team-engagement';
 
 export interface CISOTask {
   id: string;
@@ -254,4 +256,64 @@ export interface CISOAgentState {
   capabilities: string[];
   tasksCompleted: number;
   lastActivity: string;
+}
+
+// ───────── Red Team / Offensive Security ─────────────────────────────────────
+
+export type RedTeamEngagementType = 'internal' | 'external' | 'assumed-breach' | 'purple-team';
+
+export interface RedTeamScope {
+  engagementType: RedTeamEngagementType;
+  targetAssets: string[];
+  outOfScope: string[];
+  objectives: string[];
+  rulesOfEngagement: string;
+}
+
+export type RedTeamPhase = 'recon' | 'initial-access' | 'exploitation' | 'lateral-movement' | 'objective';
+
+export interface RedTeamFinding {
+  title: string;
+  phase: RedTeamPhase;
+  technique: string;   // MITRE ATT&CK ID (T####)
+  severity: RiskSeverity;
+  evidence: string;
+  recommendation: string;
+}
+
+export interface ReconFinding {
+  asset: string;
+  exposures: string[];
+  riskLevel: RiskSeverity;
+}
+
+export interface AttackPath {
+  entryPoint: string;
+  techniques: string[];   // MITRE ATT&CK IDs
+  description: string;
+  likelihood: RiskSeverity;
+}
+
+export interface LateralMovementPath {
+  technique: string;
+  description: string;
+  targetAssets: string[];
+}
+
+export interface DetectionGap {
+  technique: string;
+  techniqueName: string;
+  detectionControl: string;
+  recommendation: string;
+}
+
+export interface RedTeamReport {
+  engagementId: string;
+  scope: RedTeamScope;
+  generatedAt: string;
+  findings: RedTeamFinding[];
+  chainOfAttack: string;
+  detectionGaps: DetectionGap[];
+  recommendations: RemediationItem[];
+  purpleTeamExercises: string[];
 }
