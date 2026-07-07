@@ -6,3 +6,6 @@ dist/
 *.env
 .env.*
 coverage/
+apps/dashboard/data/history.json
+apps/dashboard/dist-web/
+apps/dashboard/.env

@@ -17,3 +17,25 @@ jobs:
       - run: npm run typecheck
       - run: npm run build
       - run: npm run test:coverage
+
+  dashboard-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      # The dashboard depends on the engine via "file:../.." — build it first so
+      # dist/index.d.ts exists for the dashboard's typecheck and Vite build.
+      - name: Build the engine
+        run: npm ci && npm run build
+      - name: Install dashboard dependencies
+        working-directory: apps/dashboard
+        run: npm ci
+      - name: Typecheck dashboard
+        working-directory: apps/dashboard
+        run: npm run typecheck
+      - name: Build dashboard
+        working-directory: apps/dashboard
+        run: npm run build
