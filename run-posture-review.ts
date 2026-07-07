@@ -9,13 +9,14 @@ console.log('');
 console.log('=== Running Full Security Posture Review ===\n');
 
 const report = await orch.runSecurityPostureReview({
-  orgName: 'Demo Organization',
-  industry: 'Technology',
-  employeeCount: 500,
-  cloudProviders: ['AWS', 'GCP'],
-  complianceFrameworks: ['SOC2', 'ISO-27001', 'NIST-CSF'],
-  existingControls: ['MFA', 'SIEM', 'EDR', 'WAF'],
-  recentIncidents: ['phishing campaign Q1 2026'],
+  orgProfile: {
+    industry: 'technology',
+    employeeCount: 500,
+    cloudProvider: 'AWS',
+    criticalAssets: ['production-db', 'auth-service', 'payment-api'],
+  },
+  frameworks: ['SOC2-TypeII', 'ISO-27001', 'NIST-CSF'],
+  zeroTrustPosture: { mfaEnforced: true, siem: true, edr: true },
   aiSystems: [
     {
       name: 'Internal LLM Chatbot',
@@ -29,7 +30,7 @@ const report = await orch.runSecurityPostureReview({
       trainingDataSource: 'third-party' as const,
       humanOversight: 'partial' as const,
       regulatoryScope: ['GDPR', 'EU-AI-ACT-HIGH-RISK'],
-    }
+    },
   ],
 });
 

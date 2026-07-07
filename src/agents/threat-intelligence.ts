@@ -200,7 +200,7 @@ export class ThreatIntelligenceAgent {
       description: params.description,
       actor,
       attackVector: params.attackVector,
-      techniques: mapping.techniques.map(t => t.id),
+      techniques: [...new Set(mapping.techniques.map(t => t.id))],
       affectedAssets: params.affectedAssets,
       likelihood: this.assessLikelihood(actor, mapping.techniques.length),
       impact: this.assessImpact(params.affectedAssets),

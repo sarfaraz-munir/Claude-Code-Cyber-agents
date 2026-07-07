@@ -4,7 +4,7 @@
  * Implements ClaudeFlowPlugin to register the CISO orchestrator and all
  * specialist agent MCP tools with the Ruflo runtime.
  *
- * Topology: hierarchical (CISO queen → 8 specialist workers)
+ * Topology: hierarchical (CISO queen → 9 specialist workers)
  * Consensus: raft
  */
 
@@ -14,7 +14,7 @@ import { createMcpTools } from './mcp-tools.js';
 export class CISOSwarmPlugin {
   readonly name = '@claude-flow/plugin-ciso-swarm';
   readonly version = '1.0.0';
-  readonly description = 'CISO-grade cybersecurity swarm: hierarchical orchestrator with 8 specialist AI agents covering risk, compliance, threat intel, architecture, IR, vuln-mgmt, DevSecOps, and awareness';
+  readonly description = 'CISO-grade cybersecurity swarm: hierarchical orchestrator with 9 specialist AI agents covering risk, compliance, threat intel, architecture, IR, vuln-mgmt, DevSecOps, awareness, and AI security';
   readonly author = 'Claude Flow Team';
   readonly dependencies = ['@claude-flow/security', '@claude-flow/memory'];
 

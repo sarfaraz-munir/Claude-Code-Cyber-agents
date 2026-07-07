@@ -3,7 +3,7 @@
  * Audits CI/CD pipelines, SAST/DAST coverage, SBOM, secrets scanning.
  */
 
-interface PipelineSecurityFinding {
+export interface PipelineSecurityFinding {
   stage: string;
   control: string;
   status: 'present' | 'missing' | 'partial';

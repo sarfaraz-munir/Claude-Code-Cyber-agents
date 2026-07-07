@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ciso-agents": {
+      "command": "npx",
+      "args": ["tsx", "/Users/smuneer/CISO-agents/src/mcp-server.ts"]
+    }
+  }
+}

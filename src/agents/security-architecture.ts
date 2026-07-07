@@ -5,7 +5,7 @@
 
 import type { RemediationItem } from '../types.js';
 
-interface ArchitectureReviewFinding {
+export interface ArchitectureReviewFinding {
   domain: string;
   control: string;
   status: 'implemented' | 'partial' | 'missing';
