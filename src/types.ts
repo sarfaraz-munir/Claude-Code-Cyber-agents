@@ -174,6 +174,7 @@ export interface SecurityPostureReport {
   recommendations: RemediationItem[];
   kpis: SecurityKPI[];
   roadmap: RoadmapItem[];
+  aiSecurityFindings?: import('./agents/ai-security.js').AISecurityFinding[];
 }
 
 export interface RemediationItem {
@@ -254,4 +255,23 @@ export interface CISOAgentState {
   capabilities: string[];
   tasksCompleted: number;
   lastActivity: string;
+}
+
+// ───────── Posture history / trending ─────────────────────────────────────────
+
+export interface PostureSummary {
+  swarmId: string;
+  timestamp: string;
+  overallScore: number;
+  maturityLevel: 1 | 2 | 3 | 4 | 5;
+  frameworksAssessed: string[];
+  criticalRisks: number;
+}
+
+export interface PostureTrend {
+  currentScore: number;
+  previousScore: number | null;
+  delta: number;
+  direction: 'improving' | 'stable' | 'degrading';
+  reviewsCompared: number;
 }

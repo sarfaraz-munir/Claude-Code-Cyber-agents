@@ -7,7 +7,7 @@ A production-ready hierarchical swarm of 10 AI agents (1 CISO queen orchestrator
 
 This repo provides structured agent files, skill files, a slash command, and 20 MCP tools that activate contextually based on security domain. Each agent contains domain expertise, methodology, frameworks, and output templates for consistent, professional-grade security deliverables.
 
-- **Hierarchical orchestration** — CISO queen spawns all 9 specialists in parallel and synthesises a unified `SecurityPostureReport`
+- **Hierarchical orchestration** — CISO queen delegates to 8 specialists and synthesises a unified `SecurityPostureReport` (incident-response playbooks are invoked on demand)
 - **Full CISO skill set** — risk, compliance, threat intelligence, architecture, IR, vuln-mgmt, DevSecOps, awareness, and AI/LLM security
 - **Multiple integration modes** — Claude Code agents (cowork), skill files, `/ciso-posture-review` command, and 20 MCP tools
 - **AI security coverage** — OWASP LLM Top 10, MITRE ATLAS, NIST AI RMF 1.0, EU AI Act 2024, ISO/IEC 42001, shadow AI inventory
@@ -68,7 +68,7 @@ This repo provides structured agent files, skill files, a slash command, and 20 
 | `ciso_security_posture_review` | Full posture review — delegates to all 9 specialists |
 | `ciso_risk_assessment` | Build risk register with CVSS scoring and treatment |
 | `ciso_compliance_gap_analysis` | Gap analysis for any supported compliance framework |
-| `ciso_threat_modeling` | MITRE ATT&CK–mapped threat scenario construction |
+| `ciso_threat_model` | MITRE ATT&CK–mapped threat scenario construction |
 | `ciso_incident_playbook` | Fetch IR playbook (ransomware / data-breach / insider-threat) |
 | `ciso_vulnerability_triage` | CVSS+EPSS triage with CISA KEV patch deadline assignment |
 | `ciso_devsecops_audit` | 12-control CI/CD pipeline security audit |
@@ -76,6 +76,23 @@ This repo provides structured agent files, skill files, a slash command, and 20 
 | `ciso_ai_governance_assessment` | AI governance gaps (NIST AI RMF / EU AI Act / ISO-42001) |
 | `ciso_swarm_status` | Query live swarm agent states |
 | + 10 more | (see `src/mcp-tools.ts` for full list) |
+
+### Running the MCP server
+
+The tools are served by a stdio MCP server (`src/mcp-server.ts`). Build once, then register it with Claude Code:
+
+```bash
+# one-time, from the repo:
+npm install && npm run build
+
+# register with Claude Code (project scope):
+claude mcp add ciso-agents -- node /Users/smuneer/CISO-agents/dist/mcp-server.js
+
+# verify:
+claude mcp list   # should show ciso-agents ✓ connected
+```
+
+To run without building (dev), use `npm run mcp:serve`. For other MCP clients, copy `.mcp.json.example` and point the path at your clone.
 
 ## Installation
 

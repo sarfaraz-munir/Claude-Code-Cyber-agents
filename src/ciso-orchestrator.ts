@@ -124,7 +124,7 @@ export class CISOOrchestrator {
    * collects their outputs, and synthesises a unified report.
    */
   async runSecurityPostureReview(params: SecurityPostureReviewParams): Promise<SecurityPostureReport> {
-    const rootTask = this.createTask('security-posture-review', 'ciso-queen', 'critical', params);
+    const rootTask = this.createTask('security-posture-review', 'ciso-queen', 'critical', { ...params } as Record<string, unknown>);
     this.swarmState.activeTasks.push(rootTask);
 
     // ── Delegate concurrently (simulated parallel execution) ──────────────────
@@ -142,7 +142,8 @@ export class CISOOrchestrator {
     );
 
     // ── Compliance ────────────────────────────────────────────────────────────
-    const complianceReports: ComplianceReport[] = (params.frameworks ?? ['NIST-CSF']).map(f =>
+    const requestedFrameworks = params.frameworks ?? ['NIST-CSF'];
+    const complianceReports: ComplianceReport[] = requestedFrameworks.map(f =>
       this.complianceAgent.runGapAnalysis(f as ComplianceFramework, params.complianceEvidence?.[f] ?? {}),
     );
 
@@ -167,9 +168,7 @@ export class CISOOrchestrator {
 
     // ── AI Security ───────────────────────────────────────────────────────────
     this.markAgentBusy('ai-security');
-    const aiFindings = params.aiSystems?.length
-      ? this.aiSecAgent.assessAISystem(params.aiSystems[0])
-      : [];
+    const aiFindings = (params.aiSystems ?? []).flatMap(s => this.aiSecAgent.assessAISystem(s));
     const aiRiskEntries = params.aiSystems?.length
       ? this.aiSecAgent.buildAIRiskEntries(params.aiSystems)
       : [];
@@ -186,18 +185,27 @@ export class CISOOrchestrator {
 
     const archRemediations = this.archAgent.generateArchitectureRemediations(archFindings);
     const riskRoadmap      = this.riskAgent.generateRoadmap(riskRegister);
-    const allRemedations   = [...archRemediations, ...riskRoadmap];
+    const complianceRemediations = complianceReports.flatMap(r => r.roadmap);
+    const priorityOrder: Record<string, number> = { critical: 0, high: 1, normal: 2, low: 3 };
+    const allRemediations = [...archRemediations, ...riskRoadmap, ...complianceRemediations]
+      .sort((a, b) => (priorityOrder[a.priority] ?? 3) - (priorityOrder[b.priority] ?? 3));
 
     const kpis: SecurityKPI[] = [
       { name: 'Overall Security Posture Score', value: overallScore, unit: '/100', trend: overallScore >= 70 ? 'stable' : 'degrading', target: 80 },
       { name: 'Critical Risks Open', value: riskRegister.filter(r => r.severity === 'critical').length, unit: 'count', trend: 'stable', target: 0 },
-      { name: 'Average Compliance Score', value: `${Math.round(complianceReports.reduce((s, r) => s + r.complianceScore, 0) / Math.max(complianceReports.length, 1))}%`, unit: '', trend: 'stable' },
+      ...(complianceReports.length > 0 ? [{
+        name: 'Average Compliance Score',
+        value: Math.round(complianceReports.reduce((s, r) => s + r.complianceScore, 0) / complianceReports.length),
+        unit: '%',
+        trend: 'stable' as const,
+        target: 90,
+      }] : []),
       { name: 'Critical CVEs Unpatched', value: vulns.filter(v => v.severity === 'critical' && v.status === 'open').length, unit: 'count', trend: 'stable', target: 0 },
       { name: 'Critical Architecture Gaps', value: archFindings.filter(f => f.status !== 'implemented' && f.severity === 'critical').length, unit: 'count', trend: 'stable', target: 0 },
-      ...awarenessKPIs.slice(0, 3).map(k => ({ name: k.metric, value: k.target, unit: '', trend: 'stable' as const })),
+      ...awarenessKPIs.slice(0, 3).map(k => ({ name: k.metric, value: 'not yet measured', unit: '', trend: 'stable' as const, target: k.target })),
     ];
 
-    const roadmap: RoadmapItem[] = this.buildRoadmap(allRemedations);
+    const roadmap: RoadmapItem[] = this.buildRoadmap(allRemediations);
 
     const report: SecurityPostureReport = {
       generatedAt: new Date().toISOString(),
@@ -209,7 +217,87 @@ export class CISOOrchestrator {
       complianceReports,
       threatScenarios,
       vulnerabilities: vulns,
-      recommendations: allRemedations.slice(0, 20),
+      recommendations: allRemediations.slice(0, 20),
+      aiSecurityFindings: aiFindings,
+      kpis,
+      roadmap,
+    };
+
+    this.completeTask(rootTask);
+    this.markAgentIdle('ciso-queen');
+
+    return report;
+  }
+
+  /**
+   * Ruflo-native parallel variant. Fires all specialist agents concurrently via
+   * Promise.all and returns the same SecurityPostureReport shape as the
+   * sequential method. The agent methods are synchronous CPU work deferred to
+   * microtasks — this matches the approved spec's API-compatibility goal, not a
+   * throughput claim. The sequential runSecurityPostureReview() is untouched.
+   */
+  async runSecurityPostureReviewParallel(params: SecurityPostureReviewParams): Promise<SecurityPostureReport> {
+    const rootTask = this.createTask('security-posture-review', 'ciso-queen', 'critical', { ...params } as Record<string, unknown>);
+    this.swarmState.activeTasks.push(rootTask);
+
+    const roles: CISOAgentRole[] = ['risk-governance','compliance-audit','threat-intelligence','security-architecture','vulnerability-management','devsecops','security-awareness','ai-security'];
+    for (const role of roles) this.markAgentBusy(role);
+
+    const [riskRegisterBase, complianceReports, threatScenarios, archFindings, vulns, , awarenessKPIs, aiRiskEntries, aiFindings] = await Promise.all([
+      Promise.resolve().then(() => this.riskAgent.buildRiskRegister(params.riskFindings ?? this.defaultRiskFindings(params.orgProfile))),
+      Promise.resolve().then(() => (params.frameworks ?? ['NIST-CSF']).map(f => this.complianceAgent.runGapAnalysis(f as ComplianceFramework, params.complianceEvidence?.[f] ?? {}))),
+      Promise.resolve().then(() => (params.threatScenarios ?? this.defaultThreatScenarios(params.orgProfile)).map(ts => this.threatAgent.buildThreatScenario(ts))),
+      Promise.resolve().then(() => this.archAgent.assessZeroTrust(params.zeroTrustPosture ?? {})),
+      Promise.resolve().then(() => params.vulnerabilities?.length ? this.vulnAgent.triageVulnerabilities(params.vulnerabilities) : []),
+      Promise.resolve().then(() => this.devSecOpsAgent.auditPipeline(params.pipelinePosture ?? {})),
+      Promise.resolve().then(() => this.awarenessAgent.buildKPIDashboard()),
+      Promise.resolve().then(() => params.aiSystems?.length ? this.aiSecAgent.buildAIRiskEntries(params.aiSystems) : []),
+      Promise.resolve().then(() => (params.aiSystems ?? []).flatMap(s => this.aiSecAgent.assessAISystem(s))),
+    ]);
+
+    const riskRegister = [...riskRegisterBase, ...aiRiskEntries];
+    for (const role of roles) this.markAgentIdle(role);
+
+    // ── CISO Queen synthesises (identical to the sequential method) ───────────
+    const overallScore  = this.computePostureScore(riskRegister, complianceReports, archFindings, vulns);
+    const maturityLevel = this.computeMaturityLevel(overallScore) as SecurityPostureReport['maturityLevel'];
+
+    const archRemediations = this.archAgent.generateArchitectureRemediations(archFindings);
+    const riskRoadmap      = this.riskAgent.generateRoadmap(riskRegister);
+    const complianceRemediations = complianceReports.flatMap(r => r.roadmap);
+    const priorityOrder: Record<string, number> = { critical: 0, high: 1, normal: 2, low: 3 };
+    const allRemediations = [...archRemediations, ...riskRoadmap, ...complianceRemediations]
+      .sort((a, b) => (priorityOrder[a.priority] ?? 3) - (priorityOrder[b.priority] ?? 3));
+
+    const kpis: SecurityKPI[] = [
+      { name: 'Overall Security Posture Score', value: overallScore, unit: '/100', trend: overallScore >= 70 ? 'stable' : 'degrading', target: 80 },
+      { name: 'Critical Risks Open', value: riskRegister.filter(r => r.severity === 'critical').length, unit: 'count', trend: 'stable', target: 0 },
+      ...(complianceReports.length > 0 ? [{
+        name: 'Average Compliance Score',
+        value: Math.round(complianceReports.reduce((s, r) => s + r.complianceScore, 0) / complianceReports.length),
+        unit: '%',
+        trend: 'stable' as const,
+        target: 90,
+      }] : []),
+      { name: 'Critical CVEs Unpatched', value: vulns.filter(v => v.severity === 'critical' && v.status === 'open').length, unit: 'count', trend: 'stable', target: 0 },
+      { name: 'Critical Architecture Gaps', value: archFindings.filter(f => f.status !== 'implemented' && f.severity === 'critical').length, unit: 'count', trend: 'stable', target: 0 },
+      ...awarenessKPIs.slice(0, 3).map(k => ({ name: k.metric, value: 'not yet measured', unit: '', trend: 'stable' as const, target: k.target })),
+    ];
+
+    const roadmap: RoadmapItem[] = this.buildRoadmap(allRemediations);
+
+    const report: SecurityPostureReport = {
+      generatedAt: new Date().toISOString(),
+      overallScore,
+      maturityLevel,
+      summary: this.buildSummary(overallScore, riskRegister, complianceReports),
+      executiveSummary: this.buildExecutiveSummary(overallScore, maturityLevel, riskRegister, complianceReports, vulns),
+      riskRegister,
+      complianceReports,
+      threatScenarios,
+      vulnerabilities: vulns,
+      recommendations: allRemediations.slice(0, 20),
+      aiSecurityFindings: aiFindings,
       kpis,
       roadmap,
     };

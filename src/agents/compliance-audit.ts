@@ -3,7 +3,7 @@
  * Performs gap analysis against SOC 2, ISO 27001, NIST CSF, GDPR, HIPAA, PCI-DSS.
  */
 
-import type { ComplianceFramework, ComplianceControl, ComplianceReport } from '../types.js';
+import type { ComplianceFramework, ComplianceControl, ComplianceReport, RemediationItem } from '../types.js';
 
 // Canonical control catalogue — representative controls per framework
 const CONTROL_CATALOGUE: Record<ComplianceFramework, Omit<ComplianceControl, 'status' | 'evidence' | 'gaps' | 'remediationSteps'>[]> = {
@@ -85,7 +85,12 @@ export class ComplianceAuditAgent {
     framework: ComplianceFramework,
     evidenceMap: Record<string, { status: ComplianceControl['status']; evidence?: string; gaps?: string[] }>,
   ): ComplianceReport {
-    const catalogue = CONTROL_CATALOGUE[framework] ?? [];
+    const catalogue = CONTROL_CATALOGUE[framework];
+    if (!catalogue) {
+      throw new Error(
+        `Unknown compliance framework: "${framework}". Supported: ${Object.keys(CONTROL_CATALOGUE).join(', ')}`,
+      );
+    }
     const controls: ComplianceControl[] = catalogue.map(c => {
       const e = evidenceMap[c.id];
       return {
@@ -112,7 +117,7 @@ export class ComplianceAuditAgent {
     const criticalGaps = controls
       .filter(c => (c.status === 'non-compliant' || c.status === 'partial') && c.priority === 'critical');
 
-    const roadmap = controls
+    const roadmap: RemediationItem[] = controls
       .filter(c => c.status !== 'compliant' && c.status !== 'not-applicable')
       .sort((a, b) => {
         const order = { critical: 0, high: 1, normal: 2, low: 3 };

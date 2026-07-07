@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { CISOOrchestrator } from '../src/ciso-orchestrator.js';
 import { CISOSwarmPlugin }  from '../src/plugin.js';
+import { VulnerabilityManagementAgent } from '../src/index.js';
 
 describe('CISOSwarmPlugin', () => {
   it('initialises without errors', async () => {
@@ -202,5 +203,50 @@ describe('AISecurityAgent', () => {
     await orch.runSecurityPostureReview({ aiSystems: [llmProfile] });
     expect(orch.getSwarmStatus().agents['ai-security'].status).toBe('idle');
   }, 10_000);
+});
+
+describe('posture review correctness regressions', () => {
+  const orch = new CISOOrchestrator('regress');
+
+  it('patch plan never drops a vulnerability (high severity + public exploit)', () => {
+    const vulns = orch.runVulnerabilityTriage([
+      { cveId: 'CVE-2025-0001', title: 'High RCE with exploit', cvssScore: 8.1, affectedAssets: ['api'], exploitAvailable: true, exploitedInWild: false, patchAvailable: true },
+      { cveId: 'CVE-2025-0002', title: 'Critical, no exploit', cvssScore: 9.1, affectedAssets: ['db'], exploitAvailable: false, exploitedInWild: false, patchAvailable: true },
+      { cveId: 'CVE-2025-0003', title: 'KEV', cvssScore: 9.8, affectedAssets: ['vpn'], exploitAvailable: true, exploitedInWild: true, patchAvailable: true },
+      { cveId: 'CVE-2025-0004', title: 'Low', cvssScore: 3.1, affectedAssets: ['intranet'], exploitAvailable: false, exploitedInWild: false, patchAvailable: true },
+    ]);
+    const agent = new VulnerabilityManagementAgent();
+    const plan = agent.buildPatchPlan(agent.prioritise(vulns));
+    const planned = plan.flatMap(w => w.vulnerabilities.map(v => v.cveId));
+    expect(planned.sort()).toEqual(['CVE-2025-0001', 'CVE-2025-0002', 'CVE-2025-0003', 'CVE-2025-0004']);
+  });
+
+  it('rejects unknown compliance frameworks instead of reporting 100%', () => {
+    expect(() => orch.runComplianceGapAnalysis('SOC2' as never, {})).toThrow(/Unknown compliance framework/);
+  });
+
+  it('includes AI findings for every AI system in the posture report', async () => {
+    const profile = (name: string) => ({
+      name, type: 'llm' as const, deployment: 'saas-api' as const, dataClasses: ['PII'],
+      internetFacing: true, usesExternalModels: true, hasAgentCapabilities: true, hasRAG: true,
+      trainingDataSource: 'third-party' as const, humanOversight: 'partial' as const, regulatoryScope: ['GDPR'],
+    });
+    const report = await orch.runSecurityPostureReview({ aiSystems: [profile('A'), profile('B')] });
+    const names = new Set((report.aiSecurityFindings ?? []).map(f => f.systemName));
+    expect(names.has('A')).toBe(true);
+    expect(names.has('B')).toBe(true);
+  });
+
+  it('merges compliance roadmap items into recommendations', async () => {
+    const report = await orch.runSecurityPostureReview({ frameworks: ['NIST-CSF'] });
+    expect(report.recommendations.some(r => r.id.startsWith('NIST-CSF-REM-'))).toBe(true);
+  });
+
+  it('awareness KPIs carry targets, not fabricated values', async () => {
+    const report = await orch.runSecurityPostureReview({});
+    const awareness = report.kpis.find(k => k.name.toLowerCase().includes('phishing'));
+    expect(awareness?.value).toBe('not yet measured');
+    expect(awareness?.target).toBeDefined();
+  });
 });
 

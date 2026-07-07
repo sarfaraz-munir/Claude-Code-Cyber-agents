@@ -3,7 +3,7 @@
  * Designs training programmes, phishing simulations, KPIs.
  */
 
-interface AwarenessModule {
+export interface AwarenessModule {
   id: string;
   title: string;
   audience: string[];
@@ -14,7 +14,7 @@ interface AwarenessModule {
   kpis: string[];
 }
 
-interface PhishingSimulation {
+export interface PhishingSimulation {
   name: string;
   difficulty: 'easy' | 'medium' | 'hard';
   template: string;
