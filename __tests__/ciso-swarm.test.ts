@@ -11,11 +11,12 @@ describe('CISOSwarmPlugin', () => {
     await plugin.shutdown();
   });
 
-  it('exposes 10 agent types (1 queen + 9 specialists)', () => {
+  it('exposes 11 agent types (1 queen + 10 specialists)', () => {
     const plugin = new CISOSwarmPlugin();
-    expect(plugin.getAgentTypes()).toHaveLength(10);
+    expect(plugin.getAgentTypes()).toHaveLength(11);
     expect(plugin.getAgentTypes().find(a => a.type === 'ciso-queen')?.role).toBe('queen');
     expect(plugin.getAgentTypes().find(a => a.type === 'ai-security')).toBeDefined();
+    expect(plugin.getAgentTypes().find(a => a.type === 'red-team')).toBeDefined();
   });
 });
 
@@ -26,7 +27,7 @@ describe('CISOOrchestrator', () => {
     const state = orch.getSwarmStatus();
     expect(state.topology).toBe('hierarchical');
     expect(state.consensus).toBe('raft');
-    expect(Object.keys(state.agents)).toHaveLength(10);
+    expect(Object.keys(state.agents)).toHaveLength(11);
   });
 
   it('runs a security posture review with defaults', async () => {

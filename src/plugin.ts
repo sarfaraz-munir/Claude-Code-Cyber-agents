@@ -44,6 +44,7 @@ export class CISOSwarmPlugin {
       { type: 'devsecops',               description: 'SAST/DAST, SBOM, secrets scanning, pipeline hardening',               role: 'worker' },
       { type: 'security-awareness',      description: 'Training programmes, phishing simulations, security KPIs',            role: 'worker' },
       { type: 'ai-security',             description: 'LLM/ML threat modeling, OWASP LLM Top 10, MITRE ATLAS, AI governance', role: 'worker' },
+      { type: 'red-team',                description: 'Offensive security: recon, exploitation simulation, lateral movement, detection gap analysis', role: 'worker' },
     ];
   }
 

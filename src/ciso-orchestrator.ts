@@ -36,6 +36,8 @@ import { DevSecOpsAgent }              from './agents/devsecops.js';
 import { SecurityAwarenessAgent }      from './agents/security-awareness.js';
 import { AISecurityAgent }            from './agents/ai-security.js';
 import type { AISystemProfile }       from './agents/ai-security.js';
+import { RedTeamAgent }               from './agents/red-team.js';
+import type { RedTeamScope, RedTeamReport } from './types.js';
 
 // ─── Agent registry ───────────────────────────────────────────────────────────
 
@@ -67,6 +69,7 @@ export class CISOOrchestrator {
   private readonly devSecOpsAgent  = new DevSecOpsAgent();
   private readonly awarenessAgent  = new SecurityAwarenessAgent();
   private readonly aiSecAgent      = new AISecurityAgent();
+  private readonly redTeamAgent    = new RedTeamAgent();
 
   private swarmState: CISOSwarmState;
 
@@ -104,6 +107,7 @@ export class CISOOrchestrator {
         'devsecops':                makeAgentState('devsecops',                'DevSecOps Engineer',                this.devSecOpsAgent.capabilities),
         'security-awareness':       makeAgentState('security-awareness',       'Security Awareness Coordinator',    this.awarenessAgent.capabilities),
         'ai-security':              makeAgentState('ai-security',              'AI Security Specialist',            this.aiSecAgent.capabilities),
+        'red-team':                 makeAgentState('red-team',                 'Red Team Operator',                 this.redTeamAgent.capabilities),
       },
       activeTasks: [],
       completedTasks: [],
@@ -328,6 +332,20 @@ export class CISOOrchestrator {
 
   getIncidentPlaybook(type: string) {
     return this.irAgent.getPlaybook(type);
+  }
+
+  async runRedTeamEngagement(scope: RedTeamScope): Promise<RedTeamReport> {
+    const task = this.createTask('red-team-engagement', 'red-team', 'high', scope as unknown as Record<string, unknown>);
+    this.swarmState.activeTasks.push(task);
+    this.markAgentBusy('red-team');
+
+    const reconFindings   = this.redTeamAgent.runRecon(scope);
+    const attackPaths     = this.redTeamAgent.simulateExploitation(reconFindings);
+    const report          = this.redTeamAgent.buildRedTeamReport(scope, reconFindings, attackPaths);
+
+    this.completeTask(task);
+    this.markAgentIdle('red-team');
+    return report;
   }
 
   buildTabletopExercise(scenario: string, severity: Parameters<IncidentResponseAgent['buildTabletopExercise']>[1]) {

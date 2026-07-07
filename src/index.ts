@@ -13,6 +13,7 @@ export type { AISystemProfile, AISecurityFinding, AIRedTeamPlan, AIShadowInvento
 export type { ArchitectureReviewFinding } from './agents/security-architecture.js';
 export type { PipelineSecurityFinding } from './agents/devsecops.js';
 export type { AwarenessModule, PhishingSimulation } from './agents/security-awareness.js';
+export { RedTeamAgent }                from './agents/red-team.js';
 export { PostureMemoryService } from './posture-memory.js';
 export type { CommandExecutor } from './posture-memory.js';
 export * from './types.js';
