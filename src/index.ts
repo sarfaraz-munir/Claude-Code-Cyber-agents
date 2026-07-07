@@ -1,5 +1,6 @@
 export { CISOSwarmPlugin } from './plugin.js';
 export { CISOOrchestrator } from './ciso-orchestrator.js';
+export type { SecurityPostureReviewParams } from './ciso-orchestrator.js';
 export { RiskGovernanceAgent }          from './agents/risk-governance.js';
 export { ComplianceAuditAgent }         from './agents/compliance-audit.js';
 export { ThreatIntelligenceAgent }      from './agents/threat-intelligence.js';

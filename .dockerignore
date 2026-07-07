@@ -1,0 +1,7 @@
+**/node_modules
+dist
+apps/dashboard/dist-web
+apps/dashboard/data/history.json
+apps/dashboard/.env
+.git
+coverage
